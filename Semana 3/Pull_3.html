@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <script>
+            const responseAPI = {
+                "status": 200,
+                "message": "Juegos Obtenidos",
+                "data": [
+                    {"id": "101", "nombre": "FIFA 22"},
+                    {"id": "102", "nombre": "Rocket League"},
+                    {"id": "103", "nombre": "CS GO"},
+
+                ]
+            };
+            function cargarJuegos(){
+                let cmb = document.getElementById("cmbJuegos");
+                responseAPI.data.forEach((juego) => {
+                    let opt = document.createElement("option");
+                    opt.setAttribute("value", juego.id);
+                    opt.innerText = juego.nombre;
+                    cmb.appendChild(opt);                    
+                });
+            }
+        </script>
+    </head>
+    <body onload="cargarJuegos();">
+        <div>
+            <select id="cmbJuegos" name="cmbJuegos"></select>
+        </div> 
+    </body>
+</html>
