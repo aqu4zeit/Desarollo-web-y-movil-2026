@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selector de Paises</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container py-5">
+        <h1 class="mb-4">Selector de Paises</h1>
+
+        <div class="row">
+            <div class="col-md-6">
+                <label for="cmbPais" class="form-label">Selecciona un pais</label>
+                <select id="cmbPais" name="cmbPais" class="form-select">
+                    <option value="">-- Elige un pais --</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="detallePais" class="mt-4"></div>
+
+        <hr class="my-5">
+
+        <h2 class="h4 mb-3">Agregar un pais</h2>
+
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="txtNombre" class="form-label">Nombre</label>
+                <input id="txtNombre" type="text" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label for="txtCapital" class="form-label">Capital</label>
+                <input id="txtCapital" type="text" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label for="txtContinente" class="form-label">Continente</label>
+                <input id="txtContinente" type="text" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label for="txtPoblacion" class="form-label">Poblacion</label>
+                <input id="txtPoblacion" type="number" class="form-control">
+            </div>
+            <div class="col-12">
+                <button id="btnAgregar" type="button" class="btn btn-primary">Agregar pais</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const responsePaises = {
+        "status": 200,
+        "message": "Paises obtenidos correctamente",
+        "data": [
+            { "id": 1, "nombre": "Chile" },
+            { "id": 2, "nombre": "Japon" },
+            { "id": 3, "nombre": "Canada" }
+        ]
+    };
+
+    const responseDetalles = {
+        "status": 200,
+        "message": "Detalles obtenidos correctamente",
+        "data": [
+            { "id": 1, "capital": "Santiago", "continente": "America", "poblacion": 19500000 },
+            { "id": 2, "capital": "Tokio", "continente": "Asia", "poblacion": 125000000 },
+            { "id": 3, "capital": "Ottawa", "continente": "America", "poblacion": 39000000 }
+        ]
+    };
+
+    // Composicion: ambas respuestas agrupadas como propiedades de un contenedor.
+    const catalogo = { responsePaises, responseDetalles };
+    console.log("Composicion:", catalogo);
+
+    // Fusion: cada pais se une con su detalle usando el id como llave.
+    const paises = [];
+
+    catalogo.responsePaises.data.forEach((pais) => {
+        const detalle = catalogo.responseDetalles.data.find((d) => d.id === pais.id);
+        paises.push(Object.assign({}, pais, detalle));
+    });
+
+    const etiquetas = {
+        nombre: "Nombre",
+        capital: "Capital",
+        continente: "Continente",
+        poblacion: "Poblacion"
+    };
+
+    const cmbPais = document.getElementById("cmbPais");
+    const detallePais = document.getElementById("detallePais");
+
+    function agregarOpcion(pais) {
+        const opt = document.createElement("option");
+        opt.setAttribute("value", pais.id);
+        opt.innerText = pais.nombre;
+        cmbPais.appendChild(opt);
+    }
+
+    paises.forEach(agregarOpcion);
+
+    function mostrarDetalle(pais) {
+        detallePais.innerHTML = "";
+
+        // Spread para copiar y delete para quitar el id de la vista.
+        const datosVista = { ...pais };
+        delete datosVista.id;
+
+        const card = document.createElement("div");
+        card.setAttribute("class", "card");
+
+        const cardBody = document.createElement("div");
+        cardBody.setAttribute("class", "card-body");
+
+        const titulo = document.createElement("h5");
+        titulo.setAttribute("class", "card-title");
+        titulo.innerText = pais.nombre;
+        cardBody.appendChild(titulo);
+
+        const lista = document.createElement("ul");
+        lista.setAttribute("class", "list-group list-group-flush");
+
+        Object.entries(datosVista).forEach(([key, value]) => {
+            const item = document.createElement("li");
+            item.setAttribute("class", "list-group-item");
+            const texto = key === "poblacion" ? value.toLocaleString("es-CL") : value;
+            item.innerText = `${etiquetas[key]}: ${texto}`;
+            lista.appendChild(item);
+        });
+
+        cardBody.appendChild(lista);
+        card.appendChild(cardBody);
+
+        const pie = document.createElement("div");
+        pie.setAttribute("class", "card-body border-top");
+
+        const btnEliminar = document.createElement("button");
+        btnEliminar.setAttribute("type", "button");
+        btnEliminar.setAttribute("class", "btn btn-outline-danger btn-sm");
+        btnEliminar.innerText = "Eliminar pais";
+        btnEliminar.addEventListener("click", () => eliminarPais(pais.id));
+
+        pie.appendChild(btnEliminar);
+        card.appendChild(pie);
+
+        detallePais.appendChild(card);
+    }
+
+    function eliminarPais(id) {
+        const indice = paises.findIndex((p) => p.id === id);
+        paises.splice(indice, 1);
+
+        const opcion = cmbPais.querySelector(`option[value="${id}"]`);
+        cmbPais.removeChild(opcion);
+
+        cmbPais.value = "";
+        detallePais.innerHTML = "";
+    }
+
+    cmbPais.addEventListener("change", () => {
+        const pais = paises.find((p) => p.id === Number(cmbPais.value));
+        if (!pais) {
+            detallePais.innerHTML = "";
+            return;
+        }
+        mostrarDetalle(pais);
+    });
+
+    document.getElementById("btnAgregar").addEventListener("click", () => {
+        const nombre = document.getElementById("txtNombre").value.trim();
+        const capital = document.getElementById("txtCapital").value.trim();
+        const continente = document.getElementById("txtContinente").value.trim();
+        const poblacion = document.getElementById("txtPoblacion").value.trim();
+
+        if (!nombre || !capital || !continente || !poblacion) {
+            alert("Debes completar todos los campos.");
+            return;
+        }
+
+        const nuevoId = paises.length === 0 ? 1 : Math.max(...paises.map((p) => p.id)) + 1;
+
+        const base = { id: nuevoId, nombre };
+        const detalle = { capital, continente, poblacion: Number(poblacion) };
+        const nuevoPais = Object.assign({}, base, detalle);
+
+        paises.push(nuevoPais);
+        agregarOpcion(nuevoPais);
+
+        cmbPais.value = nuevoPais.id;
+        mostrarDetalle(nuevoPais);
+
+        document.getElementById("txtNombre").value = "";
+        document.getElementById("txtCapital").value = "";
+        document.getElementById("txtContinente").value = "";
+        document.getElementById("txtPoblacion").value = "";
+    });
+</script>
+
+</body>
+</html>
