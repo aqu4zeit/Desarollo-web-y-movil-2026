@@ -1,0 +1,8 @@
+const mongoose = require('mongoose');
+const productoSchema = mongoose.Schema({
+    nombre: String,
+    precio: Number,
+    categoria: String,
+    disponible: Boolean
+});
+module.exports = mongoose.model('Producto', productoSchema);
