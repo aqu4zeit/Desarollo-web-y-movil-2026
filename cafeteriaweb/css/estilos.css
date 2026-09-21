@@ -1,0 +1,148 @@
+/* Paleta Aroma & Café - Propuesta 1 (Semana 4) */
+:root {
+    --cafe-oscuro: #6B4A32;
+    --caramelo: #A67B4D;
+    --beige-claro: #D9C4A5;
+    --cafe-muy-claro: #F7F0E6;
+    --blanco-calido: #FFFDFA;
+    --marron-cacao: #5C4531;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--cafe-muy-claro);
+    color: var(--marron-cacao);
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: var(--cafe-oscuro);
+    color: var(--cafe-muy-claro);
+}
+
+@media (min-width: 768px) {
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+}
+
+.logo {
+    font-size: 2rem;
+    line-height: 1.1;
+}
+
+.sidebar hr {
+    border-color: var(--beige-claro);
+    opacity: 1;
+}
+
+.sidebar .nav-link {
+    color: var(--cafe-muy-claro);
+    padding-left: 0;
+}
+
+.sidebar .nav-link:hover {
+    color: var(--beige-claro);
+}
+
+.redes a {
+    color: var(--cafe-muy-claro);
+    font-size: 1.4rem;
+    margin-right: 0.8rem;
+}
+
+.redes a:hover {
+    color: var(--beige-claro);
+}
+
+/* Bloques del contenido */
+.bloque {
+    background-color: var(--blanco-calido);
+    border: 2px solid var(--beige-claro);
+    border-radius: 1rem;
+}
+
+.icono-circulo {
+    width: 140px;
+    height: 140px;
+    margin: auto;
+    border-radius: 50%;
+    border: 3px solid var(--caramelo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: var(--cafe-oscuro);
+}
+
+.btn-cafe {
+    background-color: var(--cafe-oscuro);
+    color: var(--blanco-calido);
+}
+
+.btn-cafe:hover {
+    background-color: var(--caramelo);
+    color: var(--blanco-calido);
+}
+
+.btn-play {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--cafe-oscuro);
+    background-color: var(--cafe-muy-claro);
+    color: var(--cafe-oscuro);
+    font-size: 2rem;
+}
+
+.btn-play:hover {
+    background-color: var(--beige-claro);
+}
+
+/* Galería */
+.foto {
+    position: relative;
+    height: 180px;
+    margin: 0;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.foto figcaption {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 0.4rem;
+    text-align: center;
+    background-color: rgba(107, 74, 50, 0.8);
+    color: var(--blanco-calido);
+}
+
+/* Menú */
+.card-menu {
+    background-color: var(--cafe-muy-claro);
+    border: 1px solid var(--beige-claro);
+}
+
+.precio {
+    color: var(--caramelo);
+    font-weight: bold;
+}
+
+/* El triangulo tiene su peso visual a la izquierda: se corre para verse centrado */
+.btn-play i {
+    position: relative;
+    left: 4px;
+}
