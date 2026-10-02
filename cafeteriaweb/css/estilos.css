@@ -15,12 +15,55 @@ html {
 body {
     background-color: var(--cafe-muy-claro);
     color: var(--marron-cacao);
+    font-family: "Lato", sans-serif;
 }
 
-/* Sidebar */
+/* Tipografia de Google Fonts: Playfair Display en titulos, Lato en el texto */
+h1, h2, h3, h4, h5,
+.logo-mini {
+    font-family: "Playfair Display", serif;
+}
+
+/* Los subtitulos chicos de la barra (Horario, Ubicacion) siguen en Lato */
+.sidebar .info h2 {
+    font-family: "Lato", sans-serif;
+    letter-spacing: 0.05rem;
+}
+
+/* Retrasos para que las animaciones de Animate.css entren una tras otra */
+.retraso-1 {
+    animation-delay: 0.2s;
+}
+
+.retraso-2 {
+    animation-delay: 0.4s;
+}
+
+.retraso-3 {
+    animation-delay: 0.6s;
+}
+
+/* Sidebar
+   Barra que se minimiza basada en "Collapsible Sidebar with Icons"
+   (codepen.io/codepen-the-selector/pen/GRVJdyg). En celular usa el offcanvas de Bootstrap. */
 .sidebar {
-    background-color: var(--cafe-oscuro);
+    --bs-offcanvas-width: 260px;
     color: var(--cafe-muy-claro);
+}
+
+.sidebar-contenido {
+    background-color: var(--cafe-oscuro);
+    height: 100%;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Ancho fijo para que el texto no se reacomode mientras la barra se abre */
+.info {
+    width: 192px;
 }
 
 @media (min-width: 768px) {
@@ -28,49 +71,272 @@ body {
         position: sticky;
         top: 0;
         height: 100vh;
-        overflow-y: auto;
+        width: 240px;
+        flex-shrink: 0;
+        transition: width 0.3s ease;
     }
+
+    /* 88px: con el mismo relleno de la barra abierta, la columna de iconos
+       queda centrada sin que los iconos se muevan al cerrar */
+    .sidebar.colapsada {
+        width: 88px;
+    }
+}
+
+/* Transiciones al abrir/cerrar: lo que se oculta se desvanece rapido (0.15s)
+   antes de que la barra se angoste; lo que aparece espera a que la barra
+   tenga espacio (retraso de 0.15s). Los iconos no cambian de tamano ni lugar. */
+.logo,
+.info,
+.sidebar .nav-link span {
+    transition: opacity 0.2s ease 0.15s;
+}
+
+.sidebar.colapsada .logo,
+.sidebar.colapsada .info,
+.sidebar.colapsada .nav-link span {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.marca {
+    position: relative;
 }
 
 .logo {
     font-size: 2rem;
     line-height: 1.1;
+    white-space: nowrap;
+}
+
+/* El "&" del logo en el tono claro de la paleta, como en el boceto */
+.logo-y {
+    color: var(--beige-claro);
+}
+
+/* El monograma va encima del logo y aparece mientras el logo se desvanece.
+   left: -5px lo centra en la barra cerrada (centro a 44px, igual que los iconos) */
+.logo-mini {
+    position: absolute;
+    top: 10px;
+    left: -5px;
+    display: flex;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--beige-claro);
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.sidebar.colapsada .logo-mini {
+    opacity: 1;
+    transition: opacity 0.2s ease 0.15s;
 }
 
 .sidebar hr {
     border-color: var(--beige-claro);
     opacity: 1;
+    width: 100%;
+}
+
+/* Mismo tamano y espaciado de iconos con la barra abierta y cerrada.
+   La caja de cada seccion llega hasta el borde derecho de la barra
+   (margin-right negativo = el relleno de la barra) y solo se redondea a la
+   izquierda, como una etiqueta de libro. Asi, al abrir/cerrar, su borde
+   derecho se mueve junto con la barra en vez de quedar cortado. */
+/* nowrap: con el flex-wrap de Bootstrap cada seccion toma el ancho de su texto
+   (aunque este invisible) y no se angosta junto con la barra */
+.sidebar .nav {
+    flex-wrap: nowrap;
+}
+
+.sidebar .nav-item {
+    min-width: 0;
 }
 
 .sidebar .nav-link {
     color: var(--cafe-muy-claro);
-    padding-left: 0;
+    padding: 0.65rem 0.5rem;
+    margin-right: -1.5rem;
+    border-radius: 0.5rem 0 0 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar .nav-link i {
+    font-size: 1.15rem;
+    margin-right: 0.6rem;
 }
 
 .sidebar .nav-link:hover {
     color: var(--beige-claro);
+    background-color: var(--marron-cacao);
+}
+
+/* Seccion actual: Gumshoe agrega la clase "active" al li del enlace */
+.sidebar .nav-item.active .nav-link {
+    color: var(--blanco-calido);
+    background-color: var(--caramelo);
+}
+
+.btn-colapsar {
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--caramelo);
+    border-radius: 0.5rem;
+    background-color: transparent;
+    color: var(--cafe-muy-claro);
+    transition: transform 0.3s ease, margin 0.3s ease;
+}
+
+.btn-colapsar:hover {
+    background-color: var(--marron-cacao);
+}
+
+/* Redes: cada icono tiene su lugar en la fila (barra abierta) y en la columna
+   (barra cerrada) dado con transform, y se desliza de uno a otro con una
+   transicion. Todos parten centrados abajo (left: 50%, bottom: 0); la caja
+   crece de alto al cerrar para que quepa la columna. */
+.redes {
+    position: relative;
+    margin-top: auto;
+    height: 1.8rem;
+    flex-shrink: 0;
+    transition: height 0.3s ease;
 }
 
 .redes a {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 1.8rem;
+    margin-left: -0.9rem;
+    text-align: center;
     color: var(--cafe-muy-claro);
     font-size: 1.4rem;
-    margin-right: 0.8rem;
+    line-height: 1.8rem;
+    transition: transform 0.3s ease;
 }
+
+.redes a:nth-child(1) { transform: translateX(-3.3rem); }
+.redes a:nth-child(2) { transform: translateX(-1.1rem); }
+.redes a:nth-child(3) { transform: translateX(1.1rem); }
+.redes a:nth-child(4) { transform: translateX(3.3rem); }
+
+.sidebar.colapsada .redes {
+    height: 8.4rem;
+}
+
+.sidebar.colapsada .redes a:nth-child(1) { transform: translateY(-6.6rem); }
+.sidebar.colapsada .redes a:nth-child(2) { transform: translateY(-4.4rem); }
+.sidebar.colapsada .redes a:nth-child(3) { transform: translateY(-2.2rem); }
+.sidebar.colapsada .redes a:nth-child(4) { transform: translateY(0); }
 
 .redes a:hover {
     color: var(--beige-claro);
 }
 
-/* Bloques del contenido */
+/* La flecha gira y se corre 4px para quedar centrada con los iconos */
+.sidebar.colapsada .btn-colapsar {
+    transform: rotate(180deg);
+    margin-right: 4px;
+}
+
+/* Boton del menu en celular */
+.btn-menu {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1030;
+}
+
+.contenido {
+    min-width: 0;
+}
+
+@media (max-width: 767.98px) {
+    .contenido {
+        padding-top: 4.5rem !important;
+    }
+}
+
+/* Bloques del contenido
+   overflow: hidden para que lo que entra animado (AOS fade-up parte 100px
+   mas abajo) no se vea fuera de la caja */
 .bloque {
     background-color: var(--blanco-calido);
     border: 2px solid var(--beige-claro);
     border-radius: 1rem;
+    overflow: hidden;
 }
 
+/* Inicio con foto de fondo (Unsplash) y una capa marron cacao encima
+   para que el texto claro se lea bien */
+.inicio-foto {
+    background-image: linear-gradient(rgba(92, 69, 49, 0.85), rgba(92, 69, 49, 0.85)),
+        url("https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1200&q=80");
+    background-size: cover;
+    background-position: center;
+    border-color: var(--cafe-oscuro);
+    color: var(--blanco-calido);
+}
+
+.inicio-foto .lead {
+    color: var(--beige-claro);
+}
+
+.inicio-foto .icono-circulo {
+    border-color: var(--beige-claro);
+    color: var(--blanco-calido);
+}
+
+.inicio-foto .vapor-linea {
+    stroke: var(--beige-claro);
+}
+
+/* Caja oscura (Promociones), como en el boceto */
+.bloque-oscuro {
+    background-color: var(--cafe-oscuro);
+    border-color: var(--cafe-oscuro);
+    color: var(--cafe-muy-claro);
+}
+
+.bloque-oscuro .form-text {
+    color: var(--beige-claro);
+}
+
+/* Sobre fondo oscuro el boton cafe no se ve: va en caramelo */
+.inicio-foto .btn-cafe,
+.bloque-oscuro .btn-cafe {
+    background-color: var(--caramelo);
+}
+
+.inicio-foto .btn-cafe:hover,
+.bloque-oscuro .btn-cafe:hover {
+    background-color: var(--beige-claro);
+    color: var(--cafe-oscuro);
+}
+
+/* Foto de Nosotros */
+.foto-nosotros {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 1rem;
+}
+
+/* Hasta 140px; si la columna es mas angosta se achica sin dejar de ser circulo */
 .icono-circulo {
-    width: 140px;
-    height: 140px;
+    width: 100%;
+    max-width: 140px;
+    aspect-ratio: 1;
     margin: auto;
     border-radius: 50%;
     border: 3px solid var(--caramelo);
@@ -79,6 +345,48 @@ body {
     justify-content: center;
     font-size: 4rem;
     color: var(--cafe-oscuro);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Vapor de la taza, basado en "Steam + Coffee Animation"
+   (codepen.io/evaschicker/pen/WNdMExe): tres lineas onduladas en SVG que se
+   dibujan hacia arriba con stroke-dashoffset y se desvanecen. Se usaron trazos
+   delgados del color de la taza en vez de las nubes blancas del original.
+   El SVG va justo encima del borde superior de la taza (34% del circulo). */
+.vapor {
+    position: absolute;
+    top: 0;
+    left: 29%;
+    width: 34%;
+    height: 34%;
+}
+
+.vapor-linea {
+    fill: none;
+    stroke: var(--cafe-oscuro);
+    stroke-width: 16;
+    stroke-linecap: round;
+    opacity: 0;
+    stroke-dasharray: 284;
+    stroke-dashoffset: 0;
+    animation: vapor 6s ease-out infinite;
+}
+
+.linea-2 {
+    animation-delay: 200ms;
+}
+
+.linea-3 {
+    animation-delay: 400ms;
+}
+
+/* Mismos pasos del original, con opacidad completa */
+@keyframes vapor {
+    0% { stroke-dashoffset: 60; opacity: 0; }
+    30% { stroke-dashoffset: 284; opacity: 1; }
+    80% { stroke-dashoffset: 568; opacity: 1; }
+    100% { stroke-dashoffset: 568; opacity: 0; }
 }
 
 .btn-cafe {
@@ -91,58 +399,313 @@ body {
     color: var(--blanco-calido);
 }
 
+/* Boton play con pulso, basado en "Pulsing Play Button"
+   (codepen.io/jaredringold/pen/zvwWyb): ::before es el anillo que crece y
+   se desvanece, ::after es el circulo visible y el icono va encima. */
 .btn-play {
+    position: relative;
+    z-index: 0;
     width: 90px;
     height: 90px;
-    border-radius: 50%;
-    border: 3px solid var(--cafe-oscuro);
-    background-color: var(--cafe-muy-claro);
+    border: none;
+    background-color: transparent;
     color: var(--cafe-oscuro);
     font-size: 2rem;
 }
 
-.btn-play:hover {
+.btn-play::before,
+.btn-play::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.btn-play::before {
+    z-index: 0;
+    background-color: var(--caramelo);
+    animation: pulso 1500ms ease-out infinite;
+}
+
+.btn-play::after {
+    z-index: 1;
+    border: 3px solid var(--cafe-oscuro);
+    background-color: var(--cafe-muy-claro);
+    transition: background-color 200ms;
+}
+
+.btn-play:hover::after {
     background-color: var(--beige-claro);
 }
 
-/* Galería */
+/* Foco con teclado: anillo redondo en caramelo en vez del recuadro del navegador */
+.btn-play:focus-visible {
+    outline: none;
+}
+
+.btn-play:focus-visible::after {
+    box-shadow: 0 0 0 0.25rem rgba(166, 123, 77, 0.5);
+}
+
+@keyframes pulso {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Modal "Nuestro proceso" */
+.modal-content {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+/* Encabezado con la misma foto y capa del inicio */
+.modal-cabecera {
+    background-image: linear-gradient(rgba(92, 69, 49, 0.85), rgba(92, 69, 49, 0.85)),
+        url("https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&q=80");
+    background-size: cover;
+    background-position: center;
+    color: var(--blanco-calido);
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.modal-subtitulo {
+    font-size: 0.8rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    color: var(--beige-claro);
+}
+
+.modal-body,
+.modal-footer {
+    background-color: var(--cafe-muy-claro);
+}
+
+.modal-footer {
+    border-top-color: var(--beige-claro);
+}
+
+/* Linea de tiempo basada en "How To - Timeline" de W3Schools
+   (w3schools.com/howto/howto_css_timeline.asp), version de una columna:
+   la linea va a la izquierda (::after), cada paso tiene un circulo sobre la
+   linea (aqui con un icono) y una tarjeta con una flecha (::before).
+   Las clases se renombraron porque .container choca con Bootstrap. */
+.linea-tiempo {
+    position: relative;
+}
+
+.linea-tiempo::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    background-color: var(--beige-claro);
+    top: 0;
+    bottom: 0;
+    left: 22px;
+    margin-left: -2px;
+    z-index: 0;
+}
+
+/* z-index en el paso (no solo en el icono): la animacion de Animate.css le deja
+   un transform al paso, y sin esto la linea queda encima de los iconos */
+.paso {
+    position: relative;
+    z-index: 1;
+    padding: 0 0 1.25rem 64px;
+}
+
+.paso:last-child {
+    padding-bottom: 0;
+}
+
+.paso-icono {
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 3px solid var(--caramelo);
+    background-color: var(--blanco-calido);
+    color: var(--cafe-oscuro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    z-index: 1;
+}
+
+.paso-contenido {
+    position: relative;
+    padding: 0.75rem 1rem;
+    background-color: var(--blanco-calido);
+    border: 1px solid var(--caramelo);
+    border-radius: 0.75rem;
+}
+
+/* Flecha hacia el circulo con borde: dos triangulos superpuestos,
+   el de afuera (::before) en caramelo y el de adentro (::after) del color
+   de la tarjeta, corrido 1px para que se vea el borde */
+.paso-contenido::before,
+.paso-contenido::after {
+    content: " ";
+    position: absolute;
+    border-style: solid;
+}
+
+.paso-contenido::before {
+    top: 16px;
+    left: -12px;
+    border-width: 12px 12px 12px 0;
+    border-color: transparent var(--caramelo) transparent transparent;
+}
+
+.paso-contenido::after {
+    top: 17px;
+    left: -10px;
+    border-width: 11px 11px 11px 0;
+    border-color: transparent var(--blanco-calido) transparent transparent;
+}
+
+.paso-contenido h5 {
+    margin-bottom: 0.2rem;
+    color: var(--cafe-oscuro);
+}
+
+/* Galería
+   Al pasar el mouse: la foto se acerca ("Zoom on Hover" de W3Schools,
+   w3schools.com/howto/howto_css_zoom_hover.asp), la franja del titulo sube desde
+   abajo ("Slide in Overlay from the Bottom",
+   w3schools.com/howto/howto_css_image_overlay_slide.asp) y se marca el borde.
+   La franja sube solo hasta el 40% para que la foto se siga viendo. */
 .foto {
     position: relative;
     height: 180px;
     margin: 0;
     border-radius: 1rem;
     overflow: hidden;
+    outline: 3px solid transparent;
+    transition: outline-color 0.5s ease;
+}
+
+.foto:hover {
+    outline-color: var(--caramelo);
 }
 
 .foto img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.foto:hover img {
+    transform: scale(1.1);
 }
 
 .foto figcaption {
     position: absolute;
     bottom: 0;
     width: 100%;
-    padding: 0.4rem;
+    height: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     background-color: rgba(107, 74, 50, 0.8);
     color: var(--blanco-calido);
+    transition: height 0.5s ease, font-size 0.5s ease;
+}
+
+.foto:hover figcaption {
+    height: 40%;
+    font-size: 1.2rem;
+}
+
+/* Contacto: el textarea con etiqueta flotante necesita un alto propio
+   (getbootstrap.com/docs/5.3/forms/floating-labels/#textareas).
+   Va con .form-floating > para ganarle a la regla de Bootstrap. */
+.form-floating > .campo-mensaje {
+    height: 130px;
+}
+
+/* Borde y sombra de foco con la paleta en vez del azul de Bootstrap */
+.form-control:focus {
+    border-color: var(--caramelo);
+    box-shadow: 0 0 0 0.25rem rgba(166, 123, 77, 0.25);
 }
 
 /* Menú */
+.btn-categoria {
+    border: 1px solid var(--caramelo);
+    border-radius: 50rem;
+    color: var(--cafe-oscuro);
+    background-color: transparent;
+}
+
+.btn-categoria:hover {
+    background-color: var(--beige-claro);
+    color: var(--cafe-oscuro);
+}
+
+.btn-categoria.active,
+.btn-categoria.active:hover {
+    background-color: var(--cafe-oscuro);
+    border-color: var(--cafe-oscuro);
+    color: var(--blanco-calido);
+}
+
+/* Tarjeta que sube al pasar el mouse con "hvr-float" de Hover.css.
+   hvr-float pone display: inline-block; se devuelve a flex para que la
+   tarjeta de Bootstrap mantenga su ancho, y se agrega una sombra. */
 .card-menu {
     background-color: var(--cafe-muy-claro);
     border: 1px solid var(--beige-claro);
 }
 
+.card-menu.hvr-float {
+    display: flex;
+    transition-property: transform, box-shadow;
+}
+
+.card-menu.hvr-float:hover {
+    box-shadow: 0 0.5rem 1rem rgba(92, 69, 49, 0.2);
+}
+
 .precio {
     color: var(--caramelo);
     font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Foto chica de cada destacado */
+.miniatura {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.6rem;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 /* El triangulo tiene su peso visual a la izquierda: se corre para verse centrado */
 .btn-play i {
     position: relative;
     left: 4px;
+    z-index: 3;
+}
+
+/* Si la persona pidio menos movimiento en su sistema, se quitan las animaciones continuas */
+@media (prefers-reduced-motion: reduce) {
+    .vapor-linea,
+    .btn-play::before {
+        animation: none;
+    }
+
+    .vapor-linea {
+        opacity: 1;
+    }
 }
