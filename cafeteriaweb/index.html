@@ -7,65 +7,97 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/hover.css/2.3.1/css/hover-min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@500;700&display=swap">
     <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
 
-<div class="container-fluid">
-    <div class="row">
+<!-- Boton del menu (solo celular) -->
+<button type="button" class="btn btn-cafe btn-menu d-md-none" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+    <i class="fa fa-bars"></i>
+</button>
 
-        <!-- Sidebar -->
-        <aside class="col-md-3 col-lg-2 sidebar p-4">
-            <h1 class="logo">Aroma<br>&amp; Café</h1>
-            <hr>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
-                <li class="nav-item"><a class="nav-link" href="#menu">Menú</a></li>
-                <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
-                <li class="nav-item"><a class="nav-link" href="#galeria">Galería</a></li>
-                <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-            </ul>
-            <hr>
-            <h2 class="h6 text-uppercase">Horario</h2>
-            <p class="mb-1">Lun - Vie: 8:00 - 20:00</p>
-            <p>Sáb - Dom: 9:00 - 20:00</p>
-            <hr>
-            <h2 class="h6 text-uppercase">Ubicación</h2>
-            <p>Av. Siempreviva 123, Santiago</p>
-            <div class="redes mt-4">
-                <a href="#"><i class="fa fa-instagram"></i></a>
-                <a href="#"><i class="fa fa-facebook"></i></a>
-                <a href="#contacto"><i class="fa fa-envelope"></i></a>
-                <a href="#"><i class="fa fa-twitter"></i></a>
+<div class="d-md-flex">
+
+        <!-- Sidebar: panel offcanvas en celular, barra fija que se minimiza en escritorio -->
+        <aside id="sidebar" class="offcanvas-md offcanvas-start sidebar">
+            <div class="sidebar-contenido">
+                <div class="d-flex justify-content-end">
+                    <button id="btnColapsar" type="button" class="btn-colapsar d-none d-md-flex" title="Cerrar barra">
+                        <i class="fa fa-chevron-left"></i>
+                    </button>
+                    <button type="button" class="btn-close btn-close-white d-md-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"></button>
+                </div>
+                <!-- La animacion va en el contenedor para que no se repita al abrir/cerrar la barra -->
+                <div class="marca animate__animated animate__fadeInDown">
+                    <h1 class="logo">Aroma<br><span class="logo-y">&amp;</span> Café</h1>
+                    <div class="logo-mini">A&amp;C</div>
+                </div>
+                <hr>
+                <ul id="navSecciones" class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link" href="#inicio" title="Inicio"><i class="fa fa-home fa-fw"></i><span>Inicio</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#menu" title="Menú"><i class="fa fa-coffee fa-fw"></i><span>Menú</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#nosotros" title="Nosotros"><i class="fa fa-users fa-fw"></i><span>Nosotros</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#galeria" title="Galería"><i class="fa fa-picture-o fa-fw"></i><span>Galería</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contacto" title="Contacto"><i class="fa fa-envelope fa-fw"></i><span>Contacto</span></a></li>
+                </ul>
+                <div class="info">
+                    <hr>
+                    <h2 class="h6 text-uppercase">Horario</h2>
+                    <p class="mb-1">Lun - Vie: 8:00 - 20:00</p>
+                    <p>Sáb - Dom: 9:00 - 20:00</p>
+                    <hr>
+                    <h2 class="h6 text-uppercase">Ubicación</h2>
+                    <p>Av. Siempreviva 123, Santiago</p>
+                </div>
+                <div class="redes">
+                    <a href="#"><i class="fa fa-instagram"></i></a>
+                    <a href="#"><i class="fa fa-facebook"></i></a>
+                    <a href="#contacto"><i class="fa fa-envelope"></i></a>
+                    <a href="#"><i class="fa fa-twitter"></i></a>
+                </div>
             </div>
         </aside>
 
         <!-- Contenido principal -->
-        <main class="col-md-9 col-lg-10 p-4">
+        <main class="contenido flex-grow-1 p-4">
 
             <!-- Inicio -->
-            <section id="inicio" class="bloque p-4 mb-4">
+            <section id="inicio" class="bloque inicio-foto p-4 mb-4">
                 <div class="row align-items-center">
-                    <div class="col-md-9">
-                        <h2 class="display-5">Café de especialidad</h2>
-                        <p class="lead">Granos seleccionados de origen único, tostados en pequeños lotes y preparados al momento por nuestros baristas.</p>
-                        <a href="#menu" class="btn btn-cafe">Ver menú</a>
+                    <div class="col-md-8">
+                        <h2 class="display-5 animate__animated animate__fadeInUp">Café de especialidad</h2>
+                        <p class="lead animate__animated animate__fadeInUp retraso-1">Granos seleccionados de origen único, tostados en pequeños lotes y preparados al momento por nuestros baristas.</p>
+                        <a href="#menu" class="btn btn-cafe animate__animated animate__fadeInUp retraso-2">Ver menú</a>
                     </div>
-                    <div class="col-md-3 text-center">
-                        <div class="icono-circulo"><i class="fa fa-coffee"></i></div>
+                    <div class="col-md-4 text-center">
+                        <div class="icono-circulo">
+                            <!-- Vapor: lineas de "Steam + Coffee Animation" (codepen.io/evaschicker/pen/WNdMExe) -->
+                            <svg class="vapor" viewBox="-10 -20 150 250" aria-hidden="true">
+                                <path class="vapor-linea linea-1" d="M64.2,40.6c-2.7,23.8,18,21,18.3,39.6c0.3,17.5-31.7,16.8-32.8,36c1.5,26.9,39.4,18.9,41.4,49.5c1.8,27.8-42.1,37.8-41,53.1"/>
+                                <path class="vapor-linea linea-2" d="M95.7,56c1.8,18.8,13,16.6,12.4,31.2C107.6,98.6,86,102.1,86,115.6c0,18.5,28,19.2,28.6,50.6c0.5,24.3-29.5,36.5-27.6,47.4"/>
+                                <path class="vapor-linea linea-3" d="M39.2,10.5C41.3,30.2,24,27.9,24.8,43.2C25.4,55.1,50.5,58.9,50.5,73c0,19.3-29.7,20.6-31.3,45.8c-1.9,30.8,37.8,25.6,40.4,57.7"/>
+                            </svg>
+                            <i class="fa fa-coffee"></i>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- Destacados + video -->
             <div class="row g-4 mb-4">
-                <div class="col-md-6">
+                <div class="col-lg-6">
                     <section class="bloque p-4 h-100">
                         <h2 class="h4">Destacados del menú</h2>
                         <ul id="listaDestacados" class="list-group list-group-flush"></ul>
                     </section>
                 </div>
-                <div class="col-md-6">
+                <div class="col-lg-6">
                     <section class="bloque p-4 h-100 d-flex flex-column justify-content-center align-items-center">
                         <button type="button" class="btn-play" data-bs-toggle="modal" data-bs-target="#modalProceso">
                             <i class="fa fa-play"></i>
@@ -83,26 +115,28 @@
             <!-- Menú completo -->
             <section id="menu" class="bloque p-4 mb-4">
                 <h2 class="h3 mb-3">Menú</h2>
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <label for="cmbCategoria" class="form-label">Categoría</label>
-                        <select id="cmbCategoria" class="form-select">
-                            <option value="">Todas</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="contenedorMenu" class="row g-4"></div>
+                <!-- Botones de categoria: se crean en app.js desde responseCategorias -->
+                <div id="filtroCategorias" class="d-flex flex-wrap gap-2 mb-4"></div>
+                <!-- align-content-start: las filas no se estiran mientras se anima el alto de la caja -->
+                <div id="contenedorMenu" class="row g-4 align-content-start"></div>
             </section>
 
             <!-- Nosotros -->
             <section id="nosotros" class="bloque p-4 mb-4">
-                <h2 class="h3">Nosotros</h2>
-                <p>Aroma &amp; Café nace del gusto por el buen café y las conversaciones sin apuro. Trabajamos directamente con productores de Colombia, Perú y Etiopía para ofrecer cafés trazables y frescos.</p>
-                <p class="mb-0">Nuestro equipo de baristas prepara cada taza con métodos de espresso y filtrado, acompañada de pastelería hecha en casa todos los días.</p>
+                <div class="row align-items-center g-4">
+                    <div class="col-md-4">
+                        <img src="https://images.unsplash.com/photo-1532713107108-dfb5d8d2fc42?w=600&q=80" alt="Barista sirviendo un café con arte latte" class="foto-nosotros">
+                    </div>
+                    <div class="col-md-8">
+                        <h2 class="h3">Nosotros</h2>
+                        <p>Aroma &amp; Café nace del gusto por el buen café y las conversaciones sin apuro. Trabajamos directamente con productores de Colombia, Perú y Etiopía para ofrecer cafés trazables y frescos.</p>
+                        <p class="mb-0">Nuestro equipo de baristas prepara cada taza con métodos de espresso y filtrado, acompañada de pastelería hecha en casa todos los días.</p>
+                    </div>
+                </div>
             </section>
 
             <!-- Promociones -->
-            <section class="bloque p-4 mb-4">
+            <section class="bloque bloque-oscuro p-4 mb-4">
                 <div class="row align-items-center g-3">
                     <div class="col-md-5">
                         <h2 class="h4 mb-0">Recibe promociones</h2>
@@ -120,18 +154,26 @@
             <!-- Contacto -->
             <section id="contacto" class="bloque p-4 mb-4">
                 <h2 class="h3 mb-3">Contacto</h2>
+                <!-- Etiquetas flotantes de Bootstrap (form-floating): el input va antes del label
+                     y necesita placeholder para que la etiqueta sepa cuando subir -->
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="txtNombre" class="form-label">Nombre</label>
-                        <input id="txtNombre" type="text" class="form-control">
+                        <div class="form-floating">
+                            <input id="txtNombre" type="text" class="form-control" placeholder="Nombre">
+                            <label for="txtNombre">Nombre</label>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="txtCorreo" class="form-label">Correo</label>
-                        <input id="txtCorreo" type="email" class="form-control">
+                        <div class="form-floating">
+                            <input id="txtCorreo" type="email" class="form-control" placeholder="Correo">
+                            <label for="txtCorreo">Correo</label>
+                        </div>
                     </div>
                     <div class="col-12">
-                        <label for="txtMensaje" class="form-label">Mensaje</label>
-                        <textarea id="txtMensaje" rows="4" class="form-control"></textarea>
+                        <div class="form-floating">
+                            <textarea id="txtMensaje" class="form-control campo-mensaje" placeholder="Mensaje"></textarea>
+                            <label for="txtMensaje">Mensaje</label>
+                        </div>
                     </div>
                     <div class="col-12">
                         <button id="btnEnviar" type="button" class="btn btn-cafe">Enviar</button>
@@ -142,24 +184,52 @@
 
             <footer class="text-center small py-3">Aroma &amp; Café · 2026</footer>
         </main>
-    </div>
 </div>
 
 <!-- Modal proceso -->
 <div class="modal fade" id="modalProceso">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Nuestro proceso</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header modal-cabecera">
+                <div>
+                    <p class="modal-subtitulo mb-1">Del grano a tu taza</p>
+                    <h4 class="modal-title">Nuestro proceso</h4>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <ol class="mb-0">
-                    <li>Seleccionamos granos de origen único.</li>
-                    <li>Tostamos en pequeños lotes cada semana.</li>
-                    <li>Molemos justo antes de preparar.</li>
-                    <li>Servimos tu café al momento.</li>
-                </ol>
+                <!-- Linea de tiempo basada en "How To - Timeline" de W3Schools (version de una columna).
+                     Los pasos entran uno tras otro cada vez que se abre el modal (Animate.css). -->
+                <div class="linea-tiempo">
+                    <div class="paso animate__animated animate__fadeInUp">
+                        <span class="paso-icono"><i class="fa fa-leaf"></i></span>
+                        <div class="paso-contenido">
+                            <h5>Selección</h5>
+                            <p class="mb-0">Seleccionamos granos de origen único.</p>
+                        </div>
+                    </div>
+                    <div class="paso animate__animated animate__fadeInUp retraso-1">
+                        <span class="paso-icono"><i class="fa fa-fire"></i></span>
+                        <div class="paso-contenido">
+                            <h5>Tostado</h5>
+                            <p class="mb-0">Tostamos en pequeños lotes cada semana.</p>
+                        </div>
+                    </div>
+                    <div class="paso animate__animated animate__fadeInUp retraso-2">
+                        <span class="paso-icono"><i class="fa fa-cog"></i></span>
+                        <div class="paso-contenido">
+                            <h5>Molienda</h5>
+                            <p class="mb-0">Molemos justo antes de preparar.</p>
+                        </div>
+                    </div>
+                    <div class="paso animate__animated animate__fadeInUp retraso-3">
+                        <span class="paso-icono"><i class="fa fa-coffee"></i></span>
+                        <div class="paso-contenido">
+                            <h5>Servicio</h5>
+                            <p class="mb-0">Servimos tu café al momento.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-cafe" data-bs-dismiss="modal">Cerrar</button>
@@ -168,6 +238,8 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/gh/cferdinandi/gumshoe@5.1.1/dist/gumshoe.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
