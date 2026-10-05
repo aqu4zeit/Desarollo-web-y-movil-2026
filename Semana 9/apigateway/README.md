@@ -79,9 +79,9 @@ uvicorn gateway:app --host 0.0.0.0 --port 8000
 
 | Usuario | Contraseña | Rol |
 |---|---|---|
-| ana | 1234 | user |
-| pedro | 5678 | user |
-| ernesto | admin123 | user, admin |
+| camila | camila123 | user |
+| diego | diego123 | user |
+| admin | admin123 | user, admin |
 
 Los tokens tienen una vigencia de 15 minutos.
 
@@ -102,7 +102,7 @@ Los tokens tienen una vigencia de 15 minutos.
 Iniciar sesión y obtener el token:
 
 ```bash
-curl -X POST http://localhost:8100/login -H "Content-Type: application/json" -H "X-Gateway-Auth-Secret: gateway-auth-secret-789" -d "{\"username\": \"ana\", \"password\": \"1234\"}"
+curl -X POST http://localhost:8100/login -H "Content-Type: application/json" -H "X-Gateway-Auth-Secret: gateway-auth-secret-789" -d "{\"username\": \"camila\", \"password\": \"camila123\"}"
 ```
 
 Usar el `access_token` recibido:

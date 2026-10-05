@@ -11,17 +11,17 @@ app = FastAPI(
 )
 
 USERS = {
-    "ana": {
-        "password": "1234",
+    "camila": {
+        "password": "camila123",
         "user_id": "USR-001",
         "roles": ["user"]
     },
-    "pedro": {
-        "password": "5678",
+    "diego": {
+        "password": "diego123",
         "user_id": "USR-002",
         "roles": ["user"]
     },
-    "ernesto": {
+    "admin": {
         "password": "admin123",
         "user_id": "USR-003",
         "roles": ["user","admin"]
