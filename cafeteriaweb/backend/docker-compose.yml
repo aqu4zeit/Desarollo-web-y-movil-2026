@@ -1,0 +1,199 @@
+# Aroma & Café: solo el API Gateway (8000) y la pasarela de pago de prueba (9500)
+# publican un puerto. El resto vive en la red "privada" (internal: sin entrada ni
+# salida fuera de Docker). Antes del primer "up" se ejecuta preparar.ps1, que
+# genera .env (ver .env.ejemplo) y carga Vault.
+
+name: aroma
+
+# Revision de salud comun: cada servicio responde /health
+x-salud: &salud
+  interval: 15s
+  timeout: 3s
+  retries: 3
+  start_period: 10s
+
+networks:
+  publica:
+  privada:
+    internal: true
+  # Salida hacia la plataforma de pago externa: solo payments y el proveedor
+  proveedores:
+
+volumes:
+  mongo-datos:
+
+services:
+  vault:
+    image: hashicorp/vault:2.2.0
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN}
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    healthcheck:
+      <<: *salud
+      test: ["CMD-SHELL", "VAULT_ADDR=http://127.0.0.1:8200 vault status"]
+    networks: [privada]
+
+  mongo:
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    volumes:
+      - mongo-datos:/data/db
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+    networks: [privada]
+
+  auth:
+    build: ./auth
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${AUTH_VAULT_TOKEN}
+    depends_on: [vault, mongo]
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8100/health')"]
+    networks: [privada]
+
+  inventory:
+    build: ./inventory
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${INVENTORY_VAULT_TOKEN}
+    depends_on: [vault, mongo]
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9100/health')"]
+    networks: [privada]
+
+  clients:
+    build: ./clients
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${CLIENTS_VAULT_TOKEN}
+      AUTH_SERVICE_URL: http://auth:8100
+      MENSAJERIA_URL: http://mensajeria:9600
+    depends_on: [vault, mongo, auth, mensajeria]
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/health')"]
+    networks: [privada]
+
+  # Adaptador de prueba del proveedor de mensajeria (externo en produccion)
+  mensajeria:
+    build: ./mensajeria
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${MENSAJERIA_VAULT_TOKEN}
+    depends_on: [vault]
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9600/health')"]
+    networks: [privada]
+
+  orders:
+    build: ./orders
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${ORDERS_VAULT_TOKEN}
+      INVENTORY_URL: http://inventory:9100
+      CLIENTS_URL: http://clients:9000
+      DESPACHO_URL: http://despacho:9400
+      PAYMENTS_URL: http://payments:9300
+    depends_on: [vault, mongo]
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9200/health')"]
+    networks: [privada]
+
+  payments:
+    build: ./payments
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${PAYMENTS_VAULT_TOKEN}
+      ORDERS_URL: http://orders:9200
+      MENSAJERIA_URL: http://mensajeria:9600
+      PROVEEDOR_URL: http://proveedor_pago:9500
+      URL_RETORNO: http://localhost:8000/api/pedidos/mios
+    depends_on: [vault, mongo]
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9300/health')"]
+    networks: [privada, proveedores]
+
+  despacho:
+    build: ./despacho
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${DESPACHO_VAULT_TOKEN}
+      ORDERS_URL: http://orders:9200
+    depends_on: [vault, mongo]
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9400/health')"]
+    networks: [privada]
+
+  # GraphQL Gateway privado (Apollo): sin base propia, consulta las APIs internas
+  graphql:
+    build: ./graphql
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${GRAPHQL_VAULT_TOKEN}
+      ORDERS_URL: http://orders:9200
+      PAYMENTS_URL: http://payments:9300
+      INVENTORY_URL: http://inventory:9100
+      DESPACHO_URL: http://despacho:9400
+    depends_on: [vault]
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8090/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+    networks: [privada]
+
+  # Adaptador de prueba de la plataforma de pago (externa en produccion). Sus
+  # claves vienen de .env: un proveedor externo no lee el Vault del comercio.
+  proveedor_pago:
+    build: ./proveedor_pago
+    environment:
+      PROVEEDOR_API_KEY: ${PROVEEDOR_API_KEY}
+      PROVEEDOR_CLAVE_FIRMA: ${PROVEEDOR_CLAVE_FIRMA}
+      URL_PUBLICA: http://localhost:9500
+      URL_NOTIFICACION: http://gateway:8000/api/pagos/notificacion
+    ports:
+      - "9500:9500"
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9500/health')"]
+    networks: [publica, proveedores]
+
+  gateway:
+    build: ./gateway
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: ${GATEWAY_VAULT_TOKEN}
+      AUTH_SERVICE_URL: http://auth:8100
+      INVENTORY_URL: http://inventory:9100
+      CLIENTS_URL: http://clients:9000
+      ORDERS_URL: http://orders:9200
+      PAYMENTS_URL: http://payments:9300
+      DESPACHO_URL: http://despacho:9400
+      GRAPHQL_URL: http://graphql:8090
+      LIMITE_POR_MINUTO: ${LIMITE_POR_MINUTO:-120}
+      LIMITE_LOGIN_POR_MINUTO: ${LIMITE_LOGIN_POR_MINUTO:-10}
+    ports:
+      - "8000:8000"
+    depends_on: [auth, inventory, clients, orders, payments, despacho, graphql]
+    restart: unless-stopped
+    healthcheck:
+      <<: *salud
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+    networks: [publica, privada]
