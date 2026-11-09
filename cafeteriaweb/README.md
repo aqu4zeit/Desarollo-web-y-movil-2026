@@ -1,6 +1,7 @@
-# Aroma & Café — Frontend
+# Aroma & Café
 
-Página web de la cafetería Aroma & Café, proyecto del ramo Desarrollo Web y Móvil (NRC 8481, UNAB).
+Página web y backend de la cafetería Aroma & Café, proyecto del ramo Desarrollo Web y Móvil (NRC 8481, UNAB).
+Caso 4 del curso: café de especialidad y repostería.
 
 Página publicada: https://aqu4zeit.github.io/Desarollo-web-y-movil-2026/cafeteriaweb/
 
@@ -11,8 +12,9 @@ cafeteriaweb/
 ├── index.html      # página única con todas las secciones
 ├── css/
 │   └── estilos.css # paleta (Propuesta 1, Semana 4) y estilos
-└── js/
-    └── app.js      # datos, menú, filtro, formularios y animaciones
+├── js/
+│   └── app.js      # datos, menú, filtro, formularios y animaciones
+└── backend/        # microservicios, gateways y Docker (ver backend/README.md)
 ```
 
 ## Cómo verla en local
@@ -24,6 +26,12 @@ py -m http.server 5500
 ```
 
 y entrar a http://localhost:5500
+
+## Backend
+
+El backend (Evaluación 2) se levanta desde `backend/` con `.\preparar.ps1` y responde en http://localhost:8000/api.
+Las instrucciones, los usuarios de prueba y las pruebas están en [backend/README.md](backend/README.md). La página
+todavía muestra sus datos locales; la conexión con la API queda para la Evaluación 3.
 
 ## Librerías (por CDN)
 

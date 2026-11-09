@@ -1,0 +1,17 @@
+{
+  "name": "aroma-graphql",
+  "version": "1.0.0",
+  "description": "GraphQL Gateway privado de Aroma & Café",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "apollo-server-express": "3.13.0",
+    "express": "4.21.2",
+    "graphql": "15.10.1"
+  }
+}
