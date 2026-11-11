@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const {ApolloServer, gql} = require('apollo-server-express');
 const Cliente = require('./models/clientes');
+const Producto = require('./models/productos');
 
 mongoose.connect('mongodb://localhost:27017/UNAB');
 const typeDefs = gql`
@@ -17,17 +18,36 @@ const typeDefs = gql`
         nombre: String!
         pass: String!
     }
+    type Producto {
+        id: ID!
+        nombre: String!
+        precio: Int!
+        categoria: String!
+        disponible: Boolean!
+    }
+
+    input ProductoInput {
+        nombre: String!
+        precio: Int!
+        categoria: String!
+        disponible: Boolean!
+    }
     type Alert{
         message: String
     }
     type Query{
         getClientes: [Cliente]
         getClientesByID(id: ID!): Cliente
+        getProductos: [Producto]
+        getProductoByID(id: ID!): Producto
     }
     type Mutation{
        addCliente(input: ClienteInput): Cliente
        updCliente(id: ID!, input: ClienteInput): Cliente
        delCliente(id: ID!): Alert
+       addProducto(input: ProductoInput): Producto
+       updProducto(id: ID!, input: ProductoInput): Producto
+       delProducto(id: ID!): Alert
     }
 `;
 
@@ -43,6 +63,18 @@ const resolvers ={
                 return null;
             }else {
                 return clienteBus;
+            }
+        },
+        async getProductos(obj) {
+            const productos = await Producto.find();
+            return productos;
+        },
+        async getProductoByID(obj, { id }) {
+            const productoBus = await Producto.findById(id);
+            if (productoBus == null) {
+                return null;
+            } else {
+                return productoBus;
             }
         }
     },
@@ -60,6 +92,21 @@ const resolvers ={
             await Cliente.deleteOne({_id: id});
             return {
                 message: "Cliente Eliminado"
+            };
+        },
+        async addProducto(obj, { input }) {
+            const producto = new Producto(input);
+            await producto.save();
+            return producto;
+        },
+        async updProducto(obj, { id, input }) {
+            const producto = await Producto.findByIdAndUpdate(id, input);
+            return producto;
+        },
+        async delProducto(obj, { id }) {
+            await Producto.deleteOne({ _id: id });
+            return {
+                message: "Producto Eliminado"
             }
         }
     }
