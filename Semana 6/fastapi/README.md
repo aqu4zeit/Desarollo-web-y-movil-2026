@@ -34,6 +34,12 @@ uvicorn main_clientes:app --reload
 | PUT | `/clientes/{cliente_id}` | Actualiza un cliente |
 | DELETE | `/clientes/{cliente_id}` | Elimina un cliente (204) |
 
+| GET    | `/productos`               | Lista productos, con filtro `q` (por nombre), `skip` y `limit` |
+| POST   | `/productos`               | Crea un producto (201)                                         |
+| GET    | `/productos/{producto_id}` | Obtiene un producto por id                                     |
+| PUT    | `/productos/{producto_id}` | Actualiza un producto                                          |
+| DELETE | `/productos/{producto_id}` | Elimina un producto (204)                                      |
+
 ### Modelo `Cliente`
 
 ```json
@@ -44,3 +50,13 @@ uvicorn main_clientes:app --reload
 ```
 
 `id` se agrega automáticamente en las respuestas (viene del `_id` de MongoDB).
+
+### Modelo Producto
+
+```json
+{
+  "nombre": "string",
+  "precio": 0,
+  "categoria": "string",
+  "disponible": true
+}
