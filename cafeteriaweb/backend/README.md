@@ -66,12 +66,19 @@ Vault corre en modo desarrollo (en memoria): si su contenedor se reinicia, se vu
 
 ## Conexión con el frontend
 
-En esta entrega el backend funciona solo: la página (`index.html`) todavía usa sus datos locales. Para conectarla:
+La página se sirve aparte (`py -m http.server 5500` en `cafeteriaweb`) y llama al gateway con `fetch`. Como página
+(`localhost:5500`) y gateway (`localhost:8000`) son orígenes distintos, el gateway tiene `CORSMiddleware`:
 
-1. Montar la carpeta de la página en el gateway (`FRONTEND_DIR` y `StaticFiles`), así página y API quedan en el mismo
-   origen y la cookie de sesión funciona sin CORS.
-2. Cambiar `URL_RETORNO` de `payments` a la página del cliente, que lee `?pedido=` al volver de la pasarela.
-3. Reemplazar los datos locales de `app.js` por llamadas `fetch` a las rutas de la tabla del gateway.
+- Autoriza solo el origen `FRONTEND_ORIGEN` (por defecto `http://localhost:5500`), con credenciales para que viaje
+  la cookie de sesión. Otro origen no recibe `Access-Control-Allow-Origin` y el navegador bloquea la respuesta.
+- Expone `X-Correlation-Id`, para enlazar la acción de la página con su línea en el log del gateway.
+
+Cambio respecto de la Evaluación 2: allí se proponía montar la página dentro del gateway (`StaticFiles`) para evitar
+CORS. Se eligió CORS porque deja la página independiente del backend, como en la Unidad 1, y el gateway sigue
+sirviendo solo la API. Como la página y el gateway comparten el host `localhost`, la cookie `SameSite=Strict` del login
+sigue viajando.
+
+Pendiente para los flujos de pago: cambiar `URL_RETORNO` de `payments` a la página del cliente.
 
 ## De dónde salió cada parte
 

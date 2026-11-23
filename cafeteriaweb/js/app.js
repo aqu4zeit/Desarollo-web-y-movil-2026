@@ -1,28 +1,39 @@
-// Datos con el mismo formato de respuesta usado en Semana 3 (status, message, data).
-const responseCategorias = {
-    "status": 200,
-    "message": "Categorias obtenidas correctamente",
-    "data": [
-        { "id": 1, "nombre": "Cafés" },
-        { "id": 2, "nombre": "Bebidas frías" },
-        { "id": 3, "nombre": "Pastelería" }
-    ]
-};
+// ---- Conexion con el backend ----
+const API_URL = "http://localhost:8000";
 
-const responseProductos = {
-    "status": 200,
-    "message": "Productos obtenidos correctamente",
-    "data": [
-        { "id": 1, "categoriaId": 1, "nombre": "Espresso", "descripcion": "Shot intenso de café de especialidad.", "precio": 2200, "destacado": true, "imagen": "https://images.unsplash.com/photo-1705952285570-113e76f63fb0?w=120&h=120&fit=crop&q=80" },
-        { "id": 2, "categoriaId": 1, "nombre": "Cappuccino", "descripcion": "Espresso con leche vaporizada y espuma.", "precio": 3200, "destacado": true, "imagen": "https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=120&h=120&fit=crop&q=80" },
-        { "id": 3, "categoriaId": 1, "nombre": "Flat White", "descripcion": "Doble espresso con leche sedosa.", "precio": 3400, "destacado": false },
-        { "id": 4, "categoriaId": 1, "nombre": "Filtrado V60", "descripcion": "Método manual que resalta notas del grano.", "precio": 3600, "destacado": false },
-        { "id": 5, "categoriaId": 2, "nombre": "Cold Brew", "descripcion": "Café extraído en frío durante 18 horas.", "precio": 3500, "destacado": true, "imagen": "https://images.unsplash.com/photo-1625126590447-cb769384e1f0?w=120&h=120&fit=crop&q=80" },
-        { "id": 6, "categoriaId": 2, "nombre": "Latte helado", "descripcion": "Espresso, leche y hielo.", "precio": 3300, "destacado": false },
-        { "id": 7, "categoriaId": 3, "nombre": "Croissant", "descripcion": "Hojaldre de mantequilla horneado cada mañana.", "precio": 2500, "destacado": false },
-        { "id": 8, "categoriaId": 3, "nombre": "Cheesecake", "descripcion": "Con salsa de frutos rojos.", "precio": 3800, "destacado": false }
-    ]
-};
+// Devuelve {status, message, data}; status 0 si el gateway no responde
+async function llamarApi(metodo, ruta, cuerpo) {
+    const opciones = { method: metodo, credentials: "include", headers: {} };
+    if (cuerpo !== undefined) {
+        opciones.headers["Content-Type"] = "application/json";
+        opciones.body = JSON.stringify(cuerpo);
+    }
+
+    let respuesta;
+    try {
+        respuesta = await fetch(API_URL + ruta, opciones);
+    } catch (error) {
+        console.log(metodo, ruta, "-> sin respuesta del gateway");
+        return { status: 0, message: "Sin conexión con el servidor", data: null };
+    }
+
+    const correlacion = respuesta.headers.get("X-Correlation-Id");
+    console.log(metodo, ruta, "->", respuesta.status, "correlacion:", correlacion);
+
+    let data = null;
+    try {
+        data = await respuesta.json();
+    } catch (error) {
+        data = null;
+    }
+    let message = "";
+    if (data && data.message) {
+        message = data.message;
+    } else if (data && typeof data.detail === "string") {
+        message = data.detail;
+    }
+    return { status: respuesta.status, message: message, data: data };
+}
 
 const galeria = [
     { "imagen": "https://images.unsplash.com/photo-1760175445000-0e01e193d1cd?w=600&q=80", "titulo": "Nuestro café" },
@@ -30,19 +41,14 @@ const galeria = [
     { "imagen": "https://images.unsplash.com/photo-1623334044303-241021148842?w=600&q=80", "titulo": "Pastelería" }
 ];
 
-// Fusion: cada producto se une con el nombre de su categoria.
-const productos = responseProductos.data.map((p) => {
-    const categoria = responseCategorias.data.find((c) => c.id === p.categoriaId);
-    return Object.assign({}, p, { categoria: categoria.nombre });
-});
+// Productos del catalogo con el nombre de su categoria
+let productos = [];
 
 function formatoPrecio(precio) {
     return "$" + precio.toLocaleString("es-CL");
 }
 
-// Cambia el contenido de una caja y anima su alto del valor anterior al nuevo,
-// para que crezca o se achique sin salto. Tecnica de CSS-Tricks "Using CSS
-// Transitions on Auto Dimensions": medir antes, cambiar, medir despues y animar.
+// Anima el alto de una caja cuando cambia su contenido
 function animarAlto(elemento, cambiarContenido) {
     const altoAntes = elemento.offsetHeight;
     cambiarContenido();
@@ -66,30 +72,43 @@ function animarAlto(elemento, cambiarContenido) {
 const listaDestacados = document.getElementById("listaDestacados");
 
 // Cada destacado entra con AOS, uno tras otro (150 ms de diferencia)
-productos.filter((p) => p.destacado).forEach((p, indice) => {
-    const item = document.createElement("li");
-    item.setAttribute("class", "list-group-item d-flex align-items-center gap-3 bg-transparent");
-    item.setAttribute("data-aos", "fade-up");
-    item.setAttribute("data-aos-delay", indice * 150);
+function mostrarDestacados() {
+    listaDestacados.innerHTML = "";
+    const destacados = productos.filter((p) => p.destacado);
 
-    const miniatura = document.createElement("img");
-    miniatura.setAttribute("class", "miniatura");
-    miniatura.setAttribute("src", p.imagen);
-    miniatura.setAttribute("alt", p.nombre);
+    if (destacados.length === 0) {
+        mostrarAviso(listaDestacados, "li", "No hay destacados por ahora.", false);
+        return;
+    }
 
-    const nombre = document.createElement("span");
-    nombre.setAttribute("class", "flex-grow-1");
-    nombre.innerText = p.nombre;
+    destacados.forEach((p, indice) => {
+        const item = document.createElement("li");
+        item.setAttribute("class", "list-group-item d-flex align-items-center gap-3 bg-transparent");
+        item.setAttribute("data-aos", "fade-up");
+        item.setAttribute("data-aos-delay", indice * 150);
 
-    const precio = document.createElement("span");
-    precio.setAttribute("class", "precio");
-    precio.innerText = formatoPrecio(p.precio);
+        // Puede venir sin imagen
+        if (p.imagen) {
+            const miniatura = document.createElement("img");
+            miniatura.setAttribute("class", "miniatura");
+            miniatura.setAttribute("src", p.imagen);
+            miniatura.setAttribute("alt", p.nombre);
+            item.appendChild(miniatura);
+        }
 
-    item.appendChild(miniatura);
-    item.appendChild(nombre);
-    item.appendChild(precio);
-    listaDestacados.appendChild(item);
-});
+        const nombre = document.createElement("span");
+        nombre.setAttribute("class", "flex-grow-1");
+        nombre.innerText = p.nombre;
+
+        const precio = document.createElement("span");
+        precio.setAttribute("class", "precio");
+        precio.innerText = formatoPrecio(p.precio);
+
+        item.appendChild(nombre);
+        item.appendChild(precio);
+        listaDestacados.appendChild(item);
+    });
+}
 
 // ---- Galeria ----
 const contenedorGaleria = document.getElementById("contenedorGaleria");
@@ -115,7 +134,7 @@ galeria.forEach((foto) => {
 });
 
 // ---- Menu con filtro por categoria ----
-// Un boton por categoria (antes era un select); filtra igual que antes.
+// Un boton por categoria
 const filtroCategorias = document.getElementById("filtroCategorias");
 const contenedorMenu = document.getElementById("contenedorMenu");
 
@@ -137,7 +156,7 @@ function crearBotonCategoria(texto, valor) {
                 mostrarMenu(productos);
                 return;
             }
-            mostrarMenu(productos.filter((p) => p.categoriaId === valor));
+            mostrarMenu(productos.filter((p) => p.categoria_id === valor));
         });
     });
 
@@ -145,13 +164,15 @@ function crearBotonCategoria(texto, valor) {
     return btn;
 }
 
-crearBotonCategoria("Todas", "").classList.add("active");
-responseCategorias.data.forEach((c) => {
-    crearBotonCategoria(c.nombre, c.id);
-});
+function crearFiltros(categorias) {
+    filtroCategorias.innerHTML = "";
+    crearBotonCategoria("Todas", "").classList.add("active");
+    categorias.forEach((c) => {
+        crearBotonCategoria(c.nombre, c.id);
+    });
+}
 
-// La columna lleva la animacion de entrada (AOS) y la tarjeta el efecto
-// al pasar el mouse (Hover.css), porque los dos usan transform.
+// Columna con AOS y tarjeta con Hover.css
 function mostrarMenu(lista) {
     contenedorMenu.innerHTML = "";
 
@@ -188,13 +209,93 @@ function mostrarMenu(lista) {
         cardBody.appendChild(titulo);
         cardBody.appendChild(descripcion);
         cardBody.appendChild(precio);
+
+        // disponible = activo y con stock
+        if (!p.disponible) {
+            card.classList.add("agotado");
+            const etiqueta = document.createElement("span");
+            etiqueta.setAttribute("class", "badge etiqueta-agotado mt-2");
+            etiqueta.innerText = "Agotado";
+            cardBody.appendChild(etiqueta);
+        }
         card.appendChild(cardBody);
         col.appendChild(card);
         contenedorMenu.appendChild(col);
     });
 }
 
-mostrarMenu(productos);
+// ---- Carga del catalogo ----
+// Aviso de cargando, sin productos o no disponible
+function mostrarAviso(contenedor, etiqueta, texto, conReintento) {
+    const aviso = document.createElement(etiqueta);
+    if (etiqueta === "li") {
+        aviso.setAttribute("class", "list-group-item bg-transparent aviso-catalogo");
+    } else {
+        aviso.setAttribute("class", "col-12 aviso-catalogo");
+    }
+
+    const parrafo = document.createElement("p");
+    parrafo.setAttribute("class", "mb-2");
+    parrafo.innerText = texto;
+    aviso.appendChild(parrafo);
+
+    if (conReintento) {
+        const btn = document.createElement("button");
+        btn.setAttribute("type", "button");
+        btn.setAttribute("class", "btn btn-cafe btn-sm");
+        btn.innerText = "Reintentar";
+        btn.addEventListener("click", cargarCatalogo);
+        aviso.appendChild(btn);
+    }
+    contenedor.appendChild(aviso);
+}
+
+async function cargarCatalogo() {
+    listaDestacados.innerHTML = "";
+    contenedorMenu.innerHTML = "";
+    filtroCategorias.innerHTML = "";
+    mostrarAviso(listaDestacados, "li", "Cargando destacados...", false);
+    mostrarAviso(contenedorMenu, "div", "Cargando el menú...", false);
+
+    // Las dos consultas se hacen al mismo tiempo
+    const respuestas = await Promise.all([
+        llamarApi("GET", "/api/categorias"),
+        llamarApi("GET", "/api/productos")
+    ]);
+    const responseCategorias = respuestas[0];
+    const responseProductos = respuestas[1];
+
+    // Si falla cualquiera de las dos no se muestra un menu a medias
+    if (responseCategorias.status !== 200 || responseProductos.status !== 200) {
+        productos = [];
+        listaDestacados.innerHTML = "";
+        contenedorMenu.innerHTML = "";
+        mostrarAviso(listaDestacados, "li", "Los destacados no están disponibles en este momento.", false);
+        mostrarAviso(contenedorMenu, "div", "El menú no está disponible en este momento. Intenta de nuevo en unos minutos.", true);
+        return;
+    }
+
+    // Une cada producto con el nombre de su categoria
+    productos = responseProductos.data.map((p) => {
+        const categoria = responseCategorias.data.find((c) => c.id === p.categoria_id);
+        let nombreCategoria = "";
+        if (categoria) {
+            nombreCategoria = categoria.nombre;
+        }
+        return Object.assign({}, p, { categoria: nombreCategoria });
+    });
+
+    mostrarDestacados();
+    crearFiltros(responseCategorias.data);
+    if (productos.length === 0) {
+        contenedorMenu.innerHTML = "";
+        mostrarAviso(contenedorMenu, "div", "Todavía no hay productos en el menú.", false);
+        return;
+    }
+    mostrarMenu(productos);
+}
+
+cargarCatalogo();
 
 // ---- Promociones ----
 const suscriptores = [];
@@ -208,8 +309,9 @@ function mostrarMsgPromo(texto) {
     });
 }
 
+// Misma regla de correo que el backend
 function correoValido(correo) {
-    return correo.includes("@") && correo.includes(".");
+    return /^[^@\s]+@[^@\s]+\.[a-zA-Z]{2,}$/.test(correo);
 }
 
 document.getElementById("btnSuscribir").addEventListener("click", () => {
@@ -231,8 +333,11 @@ document.getElementById("btnSuscribir").addEventListener("click", () => {
 });
 
 // ---- Contacto ----
-const mensajes = [];
 const msgContacto = document.getElementById("msgContacto");
+const btnEnviar = document.getElementById("btnEnviar");
+
+// Campos que puede rechazar el backend (422)
+const camposContacto = { "nombre": "nombre", "correo": "correo", "mensaje": "mensaje" };
 
 function mostrarAlerta(tipo, texto) {
     animarAlto(msgContacto, () => {
@@ -244,27 +349,71 @@ function mostrarAlerta(tipo, texto) {
     });
 }
 
-document.getElementById("btnEnviar").addEventListener("click", () => {
+// Mismas reglas que el backend
+function validarContacto(nombre, correo, mensaje) {
+    if (!nombre || !correo || !mensaje) {
+        return "Debes completar todos los campos.";
+    }
+    if (nombre.length < 3) {
+        return "El nombre debe tener al menos 3 caracteres.";
+    }
+    if (!correoValido(correo)) {
+        return "Ingresa un correo válido.";
+    }
+    if (mensaje.length < 5) {
+        return "El mensaje debe tener al menos 5 caracteres.";
+    }
+    return "";
+}
+
+btnEnviar.addEventListener("click", async () => {
     const nombre = document.getElementById("txtNombre").value.trim();
     const correo = document.getElementById("txtCorreo").value.trim();
     const mensaje = document.getElementById("txtMensaje").value.trim();
 
-    if (!nombre || !correo || !mensaje) {
-        mostrarAlerta("warning", "Debes completar todos los campos.");
-        return;
-    }
-    if (!correoValido(correo)) {
-        mostrarAlerta("warning", "Ingresa un correo válido.");
+    const error = validarContacto(nombre, correo, mensaje);
+    if (error) {
+        mostrarAlerta("warning", error);
         return;
     }
 
-    mensajes.push({ nombre, correo, mensaje });
-    console.log("Mensajes:", mensajes);
-    mostrarAlerta("success", `Gracias ${nombre}, responderemos a la brevedad.`);
+    // Desactivado para no enviar dos veces
+    btnEnviar.disabled = true;
+    btnEnviar.innerText = "Enviando...";
+    const respuesta = await llamarApi("POST", "/api/contacto", { nombre, correo, mensaje });
+    btnEnviar.disabled = false;
+    btnEnviar.innerText = "Enviar";
 
-    document.getElementById("txtNombre").value = "";
-    document.getElementById("txtCorreo").value = "";
-    document.getElementById("txtMensaje").value = "";
+    if (respuesta.status === 201) {
+        mostrarAlerta("success", `Gracias ${nombre}. ${respuesta.message}`);
+        document.getElementById("txtNombre").value = "";
+        document.getElementById("txtCorreo").value = "";
+        document.getElementById("txtMensaje").value = "";
+        return;
+    }
+
+    // En los errores se conserva lo escrito
+    if (respuesta.status === 422) {
+        let campos = [];
+        if (Array.isArray(respuesta.data.detail)) {
+            campos = respuesta.data.detail.map((d) => camposContacto[d.loc[d.loc.length - 1]]).filter((c) => c);
+        }
+        let texto = "El servidor rechazó los datos. Revisa el formulario.";
+        if (campos.length > 0) {
+            texto = "El servidor rechazó los datos. Revisa: " + campos.join(", ") + ".";
+        }
+        mostrarAlerta("warning", texto);
+        return;
+    }
+    if (respuesta.status === 429) {
+        mostrarAlerta("warning", "Enviaste demasiadas solicitudes. Espera un minuto e intenta de nuevo.");
+        return;
+    }
+    if (respuesta.status === 0) {
+        mostrarAlerta("danger", "No pudimos conectar con el servidor. Revisa tu conexión e intenta de nuevo.");
+        return;
+    }
+    mostrarAlerta("danger", "El servicio de mensajes no está disponible en este momento. Intenta de nuevo en unos minutos.");
 });
 
 // ---- Barra lateral ----
@@ -280,15 +429,12 @@ btnColapsar.addEventListener("click", () => {
     }
 });
 
-// Marca la seccion que se esta viendo (Gumshoe): la activa es la ultima
-// cuyo borde superior paso la mitad de la pantalla
+// Marca la seccion visible (Gumshoe)
 const spy = new Gumshoe("#navSecciones a", {
     offset: () => window.innerHeight / 2
 });
 
-// Al elegir una seccion se centra en la pantalla, asi queda marcada como la actual.
-// Si es mas alta que la pantalla (el menu) se alinea arriba para que se vea su titulo.
-// En celular ademas se cierra el panel.
+// Centra la seccion elegida y en celular cierra el panel
 document.querySelectorAll("#sidebar .nav-link").forEach((link) => {
     link.addEventListener("click", (e) => {
         e.preventDefault();
@@ -307,10 +453,7 @@ document.querySelectorAll("#sidebar .nav-link").forEach((link) => {
 });
 
 // ---- Rebote al llegar al final de la pagina ----
-// Al seguir girando la rueda en el final, el contenido se estira hacia arriba
-// con resistencia y al soltar vuelve a su lugar. Ninguna libreria lo hace con el
-// scroll normal de la ventana en escritorio sin reemplazarlo, asi que se usa la
-// formula de "rubber band" de iOS: (1 - 1 / (distancia * c / limite + 1)) * limite
+// Formula de rubber band de iOS
 const contenido = document.querySelector(".contenido");
 const limiteRebote = 120;
 let distanciaEstirada = 0;
@@ -343,8 +486,7 @@ window.addEventListener("wheel", (e) => {
 }, { passive: true });
 
 // ---- Animaciones al hacer scroll (AOS) ----
-// Va al final para que ya existan los elementos creados arriba con JavaScript.
-// once: cada elemento se anima solo la primera vez que aparece.
+// Va al final para animar tambien lo creado con JavaScript
 AOS.init({
     once: true,
     duration: 600

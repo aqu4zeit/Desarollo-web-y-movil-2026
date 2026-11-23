@@ -9,29 +9,54 @@ Página publicada: https://aqu4zeit.github.io/Desarollo-web-y-movil-2026/cafeter
 
 ```
 cafeteriaweb/
-├── index.html      # página única con todas las secciones
+├── index.html      # página de inicio con todas las secciones
+├── mi-cuenta.html  # Mi cuenta del cliente (P08, incremento 7: archivo creado, pendiente)
+├── panel.html      # panel del personal (P09, incremento 8: archivo creado, pendiente)
+├── favicon.svg     # ícono de la pestaña (taza con la paleta de la página)
 ├── css/
 │   └── estilos.css # paleta (Propuesta 1, Semana 4) y estilos
 ├── js/
-│   └── app.js      # datos, menú, filtro, formularios y animaciones
+│   ├── app.js       # conexión con el gateway, menú, filtro, formularios y animaciones
+│   ├── mi-cuenta.js # lógica de mi-cuenta.html (pendiente)
+│   └── panel.js     # lógica de panel.html (pendiente)
+├── pruebas/        # criterios de aceptación de cada flujo en Gherkin (F00 a F08)
 └── backend/        # microservicios, gateways y Docker (ver backend/README.md)
 ```
 
 ## Cómo verla en local
 
-Abrir `index.html` en el navegador, o levantar un servidor en la carpeta:
+La página lee el menú y guarda los mensajes de contacto en el backend, así que primero hay que levantarlo
+(ver la sección Backend). Después, en la carpeta `cafeteriaweb`:
 
 ```
 py -m http.server 5500
 ```
 
-y entrar a http://localhost:5500
+y entrar a **http://localhost:5500**. Usar `localhost` y no `127.0.0.1`: el gateway solo autoriza (CORS) el origen
+`http://localhost:5500`. Abrir `index.html` con doble clic tampoco funciona, porque el navegador no deja que una
+página `file://` llame a la API.
 
 ## Backend
 
 El backend (Evaluación 2) se levanta desde `backend/` con `.\preparar.ps1` y responde en http://localhost:8000/api.
-Las instrucciones, los usuarios de prueba y las pruebas están en [backend/README.md](backend/README.md). La página
-todavía muestra sus datos locales; la conexión con la API queda para la Evaluación 3.
+Las instrucciones, los usuarios de prueba y las pruebas están en [backend/README.md](backend/README.md).
+
+## Integración (Evaluación 3)
+
+La página se conecta con el backend de a un flujo por vez. Cada flujo tiene sus escenarios en `pruebas/`.
+
+| Flujo | Qué hace la página | Servicios | Estado |
+|---|---|---|---|
+| F00 Entorno | El gateway autoriza (CORS) a `http://localhost:5500` y expone el id de correlación | API Gateway | Integrado |
+| F01 Menú y destacados | Lee categorías y productos; muestra "Agotado", "cargando" y "no disponible" con botón Reintentar | API Gateway, inventory | Integrado |
+| F02 Contacto | Valida igual que el backend y guarda el mensaje; conserva lo escrito si el servicio falla | API Gateway, clients | Integrado |
+| F03 en adelante | Cuenta, sesión, promociones, pedido y pago, Mi cuenta, panel del personal | — | Pendiente |
+
+Cada solicitud de la página escribe en la consola del navegador la ruta, el código HTTP y el id de correlación; el
+mismo id aparece en el log del gateway (`docker compose logs gateway`).
+
+La versión publicada en GitHub Pages no alcanza el backend local, así que ahí el menú muestra el aviso de "no
+disponible". La integración se prueba en local.
 
 ## Librerías (por CDN)
 

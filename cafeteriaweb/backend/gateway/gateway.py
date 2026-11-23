@@ -9,6 +9,7 @@ from typing import List, Optional
 
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
@@ -189,6 +190,19 @@ async def frontera(request: Request, call_next):
     log.info("%s %s %s %s %dms user=%s", correlacion, request.method, request.url.path,
              response.status_code, (time.monotonic() - inicio) * 1000, request.state.usuario)
     return response
+
+
+# CORS: solo la pagina (localhost:5500) puede leer las respuestas, con cookie
+FRONTEND_ORIGEN = os.getenv("FRONTEND_ORIGEN", "http://localhost:5500")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_ORIGEN],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH"],
+    allow_headers=["Content-Type", "Idempotency-Key"],
+    # La pagina puede leer el id de correlacion para enlazar la accion con el log
+    expose_headers=["X-Correlation-Id"],
+)
 
 
 async def llamar_servicio(servicio, metodo, ruta, request: Request, json=None, content=None,
