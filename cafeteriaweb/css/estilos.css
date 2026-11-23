@@ -18,19 +18,19 @@ body {
     font-family: "Lato", sans-serif;
 }
 
-/* Tipografia de Google Fonts: Playfair Display en titulos, Lato en el texto */
+/* Tipografia */
 h1, h2, h3, h4, h5,
 .logo-mini {
     font-family: "Playfair Display", serif;
 }
 
-/* Los subtitulos chicos de la barra (Horario, Ubicacion) siguen en Lato */
+/* Subtitulos de la barra en Lato */
 .sidebar .info h2 {
     font-family: "Lato", sans-serif;
     letter-spacing: 0.05rem;
 }
 
-/* Retrasos para que las animaciones de Animate.css entren una tras otra */
+/* Retrasos de Animate.css */
 .retraso-1 {
     animation-delay: 0.2s;
 }
@@ -43,9 +43,7 @@ h1, h2, h3, h4, h5,
     animation-delay: 0.6s;
 }
 
-/* Sidebar
-   Barra que se minimiza basada en "Collapsible Sidebar with Icons"
-   (codepen.io/codepen-the-selector/pen/GRVJdyg). En celular usa el offcanvas de Bootstrap. */
+/* Barra lateral */
 .sidebar {
     --bs-offcanvas-width: 260px;
     color: var(--cafe-muy-claro);
@@ -61,7 +59,7 @@ h1, h2, h3, h4, h5,
     overflow-x: hidden;
 }
 
-/* Ancho fijo para que el texto no se reacomode mientras la barra se abre */
+/* Ancho fijo del texto de la barra */
 .info {
     width: 192px;
 }
@@ -76,16 +74,13 @@ h1, h2, h3, h4, h5,
         transition: width 0.3s ease;
     }
 
-    /* 88px: con el mismo relleno de la barra abierta, la columna de iconos
-       queda centrada sin que los iconos se muevan al cerrar */
+    /* 88px: iconos centrados en la barra cerrada */
     .sidebar.colapsada {
         width: 88px;
     }
 }
 
-/* Transiciones al abrir/cerrar: lo que se oculta se desvanece rapido (0.15s)
-   antes de que la barra se angoste; lo que aparece espera a que la barra
-   tenga espacio (retraso de 0.15s). Los iconos no cambian de tamano ni lugar. */
+/* Transiciones al abrir y cerrar la barra */
 .logo,
 .info,
 .sidebar .nav-link span {
@@ -109,13 +104,12 @@ h1, h2, h3, h4, h5,
     white-space: nowrap;
 }
 
-/* El "&" del logo en el tono claro de la paleta, como en el boceto */
+/* "&" del logo */
 .logo-y {
     color: var(--beige-claro);
 }
 
-/* El monograma va encima del logo y aparece mientras el logo se desvanece.
-   left: -5px lo centra en la barra cerrada (centro a 44px, igual que los iconos) */
+/* Monograma de la barra cerrada */
 .logo-mini {
     position: absolute;
     top: 10px;
@@ -144,13 +138,8 @@ h1, h2, h3, h4, h5,
     width: 100%;
 }
 
-/* Mismo tamano y espaciado de iconos con la barra abierta y cerrada.
-   La caja de cada seccion llega hasta el borde derecho de la barra
-   (margin-right negativo = el relleno de la barra) y solo se redondea a la
-   izquierda, como una etiqueta de libro. Asi, al abrir/cerrar, su borde
-   derecho se mueve junto con la barra en vez de quedar cortado. */
-/* nowrap: con el flex-wrap de Bootstrap cada seccion toma el ancho de su texto
-   (aunque este invisible) y no se angosta junto con la barra */
+/* Enlaces de la barra */
+/* nowrap: el texto no se reacomoda al cerrar */
 .sidebar .nav {
     flex-wrap: nowrap;
 }
@@ -178,7 +167,7 @@ h1, h2, h3, h4, h5,
     background-color: var(--marron-cacao);
 }
 
-/* Seccion actual: Gumshoe agrega la clase "active" al li del enlace */
+/* Seccion actual (Gumshoe) */
 .sidebar .nav-item.active .nav-link {
     color: var(--blanco-calido);
     background-color: var(--caramelo);
@@ -200,10 +189,7 @@ h1, h2, h3, h4, h5,
     background-color: var(--marron-cacao);
 }
 
-/* Redes: cada icono tiene su lugar en la fila (barra abierta) y en la columna
-   (barra cerrada) dado con transform, y se desliza de uno a otro con una
-   transicion. Todos parten centrados abajo (left: 50%, bottom: 0); la caja
-   crece de alto al cerrar para que quepa la columna. */
+/* Redes: fila con la barra abierta, columna con la barra cerrada */
 .redes {
     position: relative;
     margin-top: auto;
@@ -243,7 +229,7 @@ h1, h2, h3, h4, h5,
     color: var(--beige-claro);
 }
 
-/* La flecha gira y se corre 4px para quedar centrada con los iconos */
+/* Flecha de la barra */
 .sidebar.colapsada .btn-colapsar {
     transform: rotate(180deg);
     margin-right: 4px;
@@ -267,9 +253,7 @@ h1, h2, h3, h4, h5,
     }
 }
 
-/* Bloques del contenido
-   overflow: hidden para que lo que entra animado (AOS fade-up parte 100px
-   mas abajo) no se vea fuera de la caja */
+/* Bloques del contenido */
 .bloque {
     background-color: var(--blanco-calido);
     border: 2px solid var(--beige-claro);
@@ -277,8 +261,7 @@ h1, h2, h3, h4, h5,
     overflow: hidden;
 }
 
-/* Inicio con foto de fondo (Unsplash) y una capa marron cacao encima
-   para que el texto claro se lea bien */
+/* Inicio con foto de fondo */
 .inicio-foto {
     background-image: linear-gradient(rgba(92, 69, 49, 0.85), rgba(92, 69, 49, 0.85)),
         url("https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1200&q=80");
@@ -301,7 +284,7 @@ h1, h2, h3, h4, h5,
     stroke: var(--beige-claro);
 }
 
-/* Caja oscura (Promociones), como en el boceto */
+/* Caja oscura (Promociones) */
 .bloque-oscuro {
     background-color: var(--cafe-oscuro);
     border-color: var(--cafe-oscuro);
@@ -312,7 +295,7 @@ h1, h2, h3, h4, h5,
     color: var(--beige-claro);
 }
 
-/* Sobre fondo oscuro el boton cafe no se ve: va en caramelo */
+/* Boton en caramelo sobre fondo oscuro */
 .inicio-foto .btn-cafe,
 .bloque-oscuro .btn-cafe {
     background-color: var(--caramelo);
@@ -332,7 +315,7 @@ h1, h2, h3, h4, h5,
     border-radius: 1rem;
 }
 
-/* Hasta 140px; si la columna es mas angosta se achica sin dejar de ser circulo */
+/* Circulo de hasta 140px */
 .icono-circulo {
     width: 100%;
     max-width: 140px;
@@ -349,11 +332,7 @@ h1, h2, h3, h4, h5,
     overflow: hidden;
 }
 
-/* Vapor de la taza, basado en "Steam + Coffee Animation"
-   (codepen.io/evaschicker/pen/WNdMExe): tres lineas onduladas en SVG que se
-   dibujan hacia arriba con stroke-dashoffset y se desvanecen. Se usaron trazos
-   delgados del color de la taza en vez de las nubes blancas del original.
-   El SVG va justo encima del borde superior de la taza (34% del circulo). */
+/* Vapor de la taza */
 .vapor {
     position: absolute;
     top: 0;
@@ -381,7 +360,7 @@ h1, h2, h3, h4, h5,
     animation-delay: 400ms;
 }
 
-/* Mismos pasos del original, con opacidad completa */
+/* Pasos del vapor */
 @keyframes vapor {
     0% { stroke-dashoffset: 60; opacity: 0; }
     30% { stroke-dashoffset: 284; opacity: 1; }
@@ -399,9 +378,7 @@ h1, h2, h3, h4, h5,
     color: var(--blanco-calido);
 }
 
-/* Boton play con pulso, basado en "Pulsing Play Button"
-   (codepen.io/jaredringold/pen/zvwWyb): ::before es el anillo que crece y
-   se desvanece, ::after es el circulo visible y el icono va encima. */
+/* Boton play con pulso */
 .btn-play {
     position: relative;
     z-index: 0;
@@ -441,7 +418,7 @@ h1, h2, h3, h4, h5,
     background-color: var(--beige-claro);
 }
 
-/* Foco con teclado: anillo redondo en caramelo en vez del recuadro del navegador */
+/* Foco con teclado */
 .btn-play:focus-visible {
     outline: none;
 }
@@ -462,7 +439,7 @@ h1, h2, h3, h4, h5,
     overflow: hidden;
 }
 
-/* Encabezado con la misma foto y capa del inicio */
+/* Encabezado del modal */
 .modal-cabecera {
     background-image: linear-gradient(rgba(92, 69, 49, 0.85), rgba(92, 69, 49, 0.85)),
         url("https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&q=80");
@@ -489,11 +466,7 @@ h1, h2, h3, h4, h5,
     border-top-color: var(--beige-claro);
 }
 
-/* Linea de tiempo basada en "How To - Timeline" de W3Schools
-   (w3schools.com/howto/howto_css_timeline.asp), version de una columna:
-   la linea va a la izquierda (::after), cada paso tiene un circulo sobre la
-   linea (aqui con un icono) y una tarjeta con una flecha (::before).
-   Las clases se renombraron porque .container choca con Bootstrap. */
+/* Linea de tiempo */
 .linea-tiempo {
     position: relative;
 }
@@ -510,8 +483,7 @@ h1, h2, h3, h4, h5,
     z-index: 0;
 }
 
-/* z-index en el paso (no solo en el icono): la animacion de Animate.css le deja
-   un transform al paso, y sin esto la linea queda encima de los iconos */
+/* z-index: la linea queda bajo los iconos */
 .paso {
     position: relative;
     z-index: 1;
@@ -547,9 +519,7 @@ h1, h2, h3, h4, h5,
     border-radius: 0.75rem;
 }
 
-/* Flecha hacia el circulo con borde: dos triangulos superpuestos,
-   el de afuera (::before) en caramelo y el de adentro (::after) del color
-   de la tarjeta, corrido 1px para que se vea el borde */
+/* Flecha de la tarjeta */
 .paso-contenido::before,
 .paso-contenido::after {
     content: " ";
@@ -576,12 +546,7 @@ h1, h2, h3, h4, h5,
     color: var(--cafe-oscuro);
 }
 
-/* Galería
-   Al pasar el mouse: la foto se acerca ("Zoom on Hover" de W3Schools,
-   w3schools.com/howto/howto_css_zoom_hover.asp), la franja del titulo sube desde
-   abajo ("Slide in Overlay from the Bottom",
-   w3schools.com/howto/howto_css_image_overlay_slide.asp) y se marca el borde.
-   La franja sube solo hasta el 40% para que la foto se siga viendo. */
+/* Galeria */
 .foto {
     position: relative;
     height: 180px;
@@ -626,14 +591,12 @@ h1, h2, h3, h4, h5,
     font-size: 1.2rem;
 }
 
-/* Contacto: el textarea con etiqueta flotante necesita un alto propio
-   (getbootstrap.com/docs/5.3/forms/floating-labels/#textareas).
-   Va con .form-floating > para ganarle a la regla de Bootstrap. */
+/* Contacto */
 .form-floating > .campo-mensaje {
     height: 130px;
 }
 
-/* Borde y sombra de foco con la paleta en vez del azul de Bootstrap */
+/* Foco con la paleta */
 .form-control:focus {
     border-color: var(--caramelo);
     box-shadow: 0 0 0 0.25rem rgba(166, 123, 77, 0.25);
@@ -659,9 +622,7 @@ h1, h2, h3, h4, h5,
     color: var(--blanco-calido);
 }
 
-/* Tarjeta que sube al pasar el mouse con "hvr-float" de Hover.css.
-   hvr-float pone display: inline-block; se devuelve a flex para que la
-   tarjeta de Bootstrap mantenga su ancho, y se agrega una sombra. */
+/* Tarjeta con hvr-float */
 .card-menu {
     background-color: var(--cafe-muy-claro);
     border: 1px solid var(--beige-claro);
@@ -691,14 +652,31 @@ h1, h2, h3, h4, h5,
     flex-shrink: 0;
 }
 
-/* El triangulo tiene su peso visual a la izquierda: se corre para verse centrado */
+/* Producto agotado */
+.card-menu.agotado {
+    opacity: 0.6;
+}
+
+.etiqueta-agotado {
+    align-self: flex-start;
+    background-color: var(--marron-cacao);
+    color: var(--cafe-muy-claro);
+}
+
+/* Avisos del catalogo */
+.aviso-catalogo {
+    color: var(--marron-cacao);
+    font-style: italic;
+}
+
+/* Triangulo del play centrado */
 .btn-play i {
     position: relative;
     left: 4px;
     z-index: 3;
 }
 
-/* Si la persona pidio menos movimiento en su sistema, se quitan las animaciones continuas */
+/* Menos movimiento */
 @media (prefers-reduced-motion: reduce) {
     .vapor-linea,
     .btn-play::before {
