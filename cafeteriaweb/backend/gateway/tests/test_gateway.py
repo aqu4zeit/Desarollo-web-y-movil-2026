@@ -140,6 +140,29 @@ def test_correlation_id_y_cabeceras_de_seguridad(cliente):
     assert r.headers["x-frame-options"] == "DENY"
 
 
+def test_cors_autoriza_solo_el_origen_de_la_pagina(cliente):
+    # Origen permitido
+    r = cliente.get("/api/productos", headers={"Origin": "http://localhost:5500"})
+    assert r.headers["access-control-allow-origin"] == "http://localhost:5500"
+    assert r.headers["access-control-allow-credentials"] == "true"
+    assert r.headers["access-control-expose-headers"] == "X-Correlation-Id"
+    # Otro origen no recibe permiso
+    r = cliente.get("/api/productos", headers={"Origin": "http://sitio-ajeno.test"})
+    assert "access-control-allow-origin" not in r.headers
+
+
+def test_cors_consulta_previa_del_post(cliente):
+    # Consulta previa (OPTIONS) del POST
+    r = cliente.options("/api/contacto", headers={
+        "Origin": "http://localhost:5500",
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type",
+    })
+    assert r.status_code == 200
+    assert r.headers["access-control-allow-origin"] == "http://localhost:5500"
+    assert "POST" in r.headers["access-control-allow-methods"]
+
+
 def test_servicio_caido(monkeypatch):
     # Sin reemplazo: el gateway intenta conectar a un servicio que no existe
     monkeypatch.setattr(gateway, "get_gateway_secrets", lambda: _secretos())
